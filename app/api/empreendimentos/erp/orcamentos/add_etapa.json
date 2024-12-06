@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "nome_etapa"
+      },
+      {
+        "type": "text",
+        "name": "descricao_etapa"
+      },
+      {
+        "type": "text",
+        "name": "token_empreendimento_etapa"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "Empreendimento_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "empreendimentos",
+                "column": "id",
+                "recid": 1
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.token_empreendimento_etapa}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "empreendimentos"
+            },
+            "primary": "id",
+            "joins": [],
+            "query": "select \"id\" from \"empreendimentos\" where \"empreendimentos\".\"token_empreendimento\" = ?",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "empreendimentos.token_empreendimento",
+                  "field": "empreendimentos.token_empreendimento",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.token_empreendimento_etapa}}",
+                  "data": {
+                    "table": "empreendimentos",
+                    "column": "token_empreendimento",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "name": "token_empreendimento"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "empreendimentos"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            }
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "insert_etapa",
+        "module": "dbupdater",
+        "action": "insert",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "insert",
+            "values": [
+              {
+                "table": "orcamento_etapa",
+                "column": "nome",
+                "type": "text",
+                "value": "{{$_POST.nome_etapa}}"
+              },
+              {
+                "table": "orcamento_etapa",
+                "column": "descricao",
+                "type": "text",
+                "value": "{{$_POST.descricao_etapa}}"
+              },
+              {
+                "table": "orcamento_etapa",
+                "column": "empreendimento_id",
+                "type": "number",
+                "value": "{{Empreendimento_atual.id}}"
+              }
+            ],
+            "table": "orcamento_etapa",
+            "returning": "id",
+            "query": "insert into \"orcamento_etapa\" (\"descricao\", \"empreendimento_id\", \"nome\") values (?, ?, ?) returning \"id\"",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.nome_etapa}}",
+                "test": ""
+              },
+              {
+                "name": ":P2",
+                "type": "expression",
+                "value": "{{$_POST.descricao_etapa}}",
+                "test": ""
+              },
+              {
+                "name": ":P3",
+                "type": "expression",
+                "value": "{{Empreendimento_atual.id}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          },
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "routes": [
+    {
+      "path": "/logout",
+      "exec": "/api/usuarios/logout"
+    },
+    {
+      "path": "/",
+      "page": "index",
+      "routeType": "page",
+      "layout": "main"
+    },
+    {
+      "path": "/cadastro",
+      "page": "cadastro",
+      "layout": "main",
+      "data": {
+        "tittle": "Cadastro"
+      }
+    },
+    {
+      "path": "/login",
+      "page": "login",
+      "layout": "main",
+      "data": {
+        "tittle": "Login"
+      }
+    },
+    {
+      "path": "/esqueceu_senha",
+      "page": "esqueceu_senha",
+      "layout": "main",
+      "data": {
+        "tittle": "Esqueceu_senha"
+      }
+    },
+    {
+      "path": "/redefinir_senha/:token",
+      "page": "redefinir_senha",
+      "layout": "main",
+      "data": {
+        "tittle": "Redefinir_senha"
+      }
+    },
+    {
+      "path": "/configuracoes",
+      "page": "configuracoes",
+      "layout": "home"
+    },
+    {
+      "path": "/testes",
+      "page": "testes",
+      "layout": "erp"
+    },
+    {
+      "path": "/empreendimentos",
+      "page": "empreendimentos",
+      "layout": "home"
+    },
+    {
+      "path": "/add_empreendimento",
+      "page": "add_empreendimento",
+      "layout": "home"
+    },
+    {
+      "path": "/dashboard",
+      "page": "dashboard",
+      "layout": "erp"
+    },
+    {
+      "path": "/orcamento",
+      "page": "orcamento",
+      "layout": "erp"
+    },
+    {
+      "path": "/estoque",
+      "page": "estoque",
+      "layout": "erp"
+    },
+    {
+      "path": "/erp/:token_empreendimento",
+      "page": "erp",
+      "layout": "erp",
+      "routes": [
+        {
+          "type": "page",
+          "path": "/erp/:token_empreendimento",
+          "id": "token_empreendimento"
+        }
+      ]
+    }
+  ],
+  "layouts": {
+    "main": {
+      "meta": [
+        {
+          "type": "text",
+          "name": "tittle"
+        },
+        {
+          "type": "text",
+          "name": "icon"
+        }
+      ]
+    },
+    "home": {
+      "exec": "/api/usuarios/acesso_total"
+    },
+    "erp": {
+      "exec": "/api/usuarios/acesso_total"
+    }
+  }
+}

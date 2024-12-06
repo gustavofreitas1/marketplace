@@ -1,0 +1,229 @@
+[
+  {
+    "name": "",
+    "module": "auth",
+    "action": "restrict",
+    "options": {
+      "provider": "auth",
+      "loginUrl": "/login",
+      "forbiddenUrl": "/login"
+    }
+  },
+  {
+    "name": "identity",
+    "module": "auth",
+    "action": "identify",
+    "options": {
+      "provider": "auth"
+    },
+    "meta": []
+  },
+  {
+    "name": "buscar_dados_usuario",
+    "module": "dbconnector",
+    "action": "single",
+    "options": {
+      "connection": "db",
+      "sql": {
+        "type": "select",
+        "columns": [
+          {
+            "table": "auth_users",
+            "column": "nome",
+            "recid": 1
+          },
+          {
+            "table": "auth_users",
+            "column": "telefone",
+            "recid": 2
+          },
+          {
+            "table": "auth_users",
+            "column": "foto",
+            "recid": 3
+          },
+          {
+            "table": "auth_users",
+            "column": "email",
+            "recid": 4
+          },
+          {
+            "table": "auth_users",
+            "column": "empresa_id",
+            "recid": 5
+          },
+          {
+            "table": "auth_users",
+            "column": "empreendimento_auth",
+            "recid": 6
+          }
+        ],
+        "params": [
+          {
+            "operator": "equal",
+            "type": "expression",
+            "name": ":P1",
+            "value": "{{identity}}",
+            "test": ""
+          }
+        ],
+        "table": {
+          "name": "auth_users"
+        },
+        "primary": "id",
+        "joins": [],
+        "wheres": {
+          "condition": "AND",
+          "rules": [
+            {
+              "id": "auth_users.id",
+              "field": "auth_users.id",
+              "type": "double",
+              "operator": "equal",
+              "value": "{{identity}}",
+              "data": {
+                "table": "auth_users",
+                "column": "id",
+                "type": "number",
+                "columnObj": {
+                  "type": "increments",
+                  "default": "",
+                  "primary": true,
+                  "unique": true,
+                  "nullable": false,
+                  "name": "id"
+                }
+              },
+              "operation": "=",
+              "table": "auth_users"
+            }
+          ],
+          "conditional": null,
+          "valid": true
+        },
+        "query": "select \"nome\", \"telefone\", \"foto\", \"email\", \"empresa_id\", \"empreendimento_auth\" from \"auth_users\" where \"auth_users\".\"id\" = ?",
+        "orders": []
+      }
+    },
+    "output": true,
+    "meta": [
+      {
+        "type": "text",
+        "name": "nome"
+      },
+      {
+        "type": "text",
+        "name": "telefone"
+      },
+      {
+        "type": "text",
+        "name": "foto"
+      },
+      {
+        "type": "text",
+        "name": "email"
+      },
+      {
+        "type": "number",
+        "name": "empresa_id"
+      },
+      {
+        "type": "number",
+        "name": "empreendimento_auth"
+      }
+    ],
+    "outputType": "object"
+  },
+  {
+    "name": "empresa_atual",
+    "module": "dbconnector",
+    "action": "single",
+    "options": {
+      "connection": "db",
+      "sql": {
+        "type": "select",
+        "columns": [
+          {
+            "table": "Empresas",
+            "column": "*"
+          }
+        ],
+        "params": [
+          {
+            "operator": "equal",
+            "type": "expression",
+            "name": ":P1",
+            "value": "{{buscar_dados_usuario.empresa_id}}",
+            "test": ""
+          }
+        ],
+        "table": {
+          "name": "Empresas"
+        },
+        "primary": "id",
+        "joins": [],
+        "wheres": {
+          "condition": "AND",
+          "rules": [
+            {
+              "id": "Empresas.id",
+              "field": "Empresas.id",
+              "type": "double",
+              "operator": "equal",
+              "value": "{{buscar_dados_usuario.empresa_id}}",
+              "data": {
+                "table": "Empresas",
+                "column": "id",
+                "type": "number",
+                "columnObj": {
+                  "type": "increments",
+                  "default": "",
+                  "primary": true,
+                  "unique": true,
+                  "nullable": false,
+                  "name": "id"
+                }
+              },
+              "operation": "="
+            }
+          ],
+          "conditional": null,
+          "valid": true
+        },
+        "query": "select * from \"Empresas\" where \"Empresas\".\"id\" = ?"
+      }
+    },
+    "output": true,
+    "meta": [
+      {
+        "type": "number",
+        "name": "id"
+      },
+      {
+        "type": "text",
+        "name": "nome"
+      },
+      {
+        "type": "text",
+        "name": "cnpj"
+      },
+      {
+        "type": "text",
+        "name": "contato"
+      },
+      {
+        "type": "text",
+        "name": "numero_rua"
+      },
+      {
+        "type": "text",
+        "name": "rua"
+      },
+      {
+        "type": "text",
+        "name": "cep"
+      }
+    ],
+    "outputType": "object"
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "cadastro.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "login.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "esqueceu_senha.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "redefinir_senha.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "erp.ejs": {
+    "layoutPage": "erp",
+    "description": ""
+  },
+  "configurações.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "configuracoes.ejs": {
+    "layoutPage": "home",
+    "description": ""
+  },
+  "orcamento.ejs": {
+    "layoutPage": "erp",
+    "description": ""
+  },
+  "testes.ejs": {
+    "layoutPage": "erp",
+    "description": ""
+  },
+  "empreendimentos.ejs": {
+    "layoutPage": "home",
+    "description": ""
+  },
+  "add_empreendimento.ejs": {
+    "layoutPage": "home",
+    "description": ""
+  },
+  "dashboard.ejs": {
+    "layoutPage": "erp",
+    "description": ""
+  },
+  "estoque.ejs": {
+    "layoutPage": "erp",
+    "description": ""
+  }
+}

@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "token_empreendimento"
+      },
+      {
+        "type": "text",
+        "name": "offset"
+      },
+      {
+        "type": "text",
+        "name": "limit"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "empreendimento_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "empreendimentos",
+                "column": "id"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.token_empreendimento}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "empreendimentos"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "empreendimentos.token_empreendimento",
+                  "field": "empreendimentos.token_empreendimento",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_GET.token_empreendimento}}",
+                  "data": {
+                    "table": "empreendimentos",
+                    "column": "token_empreendimento",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "name": "token_empreendimento"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select \"id\" from \"empreendimentos\" where \"empreendimentos\".\"token_empreendimento\" = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "etapa_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "orcamento_etapa",
+                "column": "id",
+                "recid": 1
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{empreendimento_atual.id}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "orcamento_etapa"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "orcamento_etapa.empreendimento_id",
+                  "field": "orcamento_etapa.empreendimento_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{empreendimento_atual.id}}",
+                  "data": {
+                    "table": "orcamento_etapa",
+                    "column": "empreendimento_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "reference",
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "references": "id",
+                      "inTable": "empreendimentos",
+                      "referenceType": "integer",
+                      "onUpdate": "CASCADE",
+                      "onDelete": "CASCADE",
+                      "name": "empreendimento_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "orcamento_etapa"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select \"id\" from \"orcamento_etapa\" where \"orcamento_etapa\".\"empreendimento_id\" = ?",
+            "sub": {
+              "subetapa": {
+                "table": {
+                  "name": "orcamento_etapa_subetapa",
+                  "alias": "subetapa"
+                },
+                "key": "orcamento_etapa_id"
+              }
+            }
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          },
+          {
+            "name": "subetapa",
+            "type": "array",
+            "sub": [
+              {
+                "type": "number",
+                "name": "id"
+              },
+              {
+                "type": "number",
+                "name": "orcamento_etapa_id"
+              },
+              {
+                "type": "text",
+                "name": "nome"
+              },
+              {
+                "type": "text",
+                "name": "descricao"
+              },
+              {
+                "type": "text",
+                "name": "unidade"
+              },
+              {
+                "type": "text",
+                "name": "quantidade"
+              },
+              {
+                "type": "text",
+                "name": "preco_unitario"
+              }
+            ]
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "listar_subetapa",
+        "module": "dbconnector",
+        "action": "paged",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "*",
+                "recid": 1
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{etapa_atual.id}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "orcamento_etapa_subetapa"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "orcamento_etapa_subetapa.orcamento_etapa_id",
+                  "field": "orcamento_etapa_subetapa.orcamento_etapa_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{etapa_atual.id}}",
+                  "data": {
+                    "table": "orcamento_etapa_subetapa",
+                    "column": "orcamento_etapa_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "reference",
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "references": "id",
+                      "inTable": "orcamento_etapa",
+                      "referenceType": "integer",
+                      "onUpdate": "CASCADE",
+                      "onDelete": "CASCADE",
+                      "name": "orcamento_etapa_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "orcamento_etapa_subetapa"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select * from \"orcamento_etapa_subetapa\" where \"orcamento_etapa_subetapa\".\"orcamento_etapa_id\" = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "offset",
+            "type": "number"
+          },
+          {
+            "name": "limit",
+            "type": "number"
+          },
+          {
+            "name": "total",
+            "type": "number"
+          },
+          {
+            "name": "page",
+            "type": "object",
+            "sub": [
+              {
+                "name": "offset",
+                "type": "object",
+                "sub": [
+                  {
+                    "name": "first",
+                    "type": "number"
+                  },
+                  {
+                    "name": "prev",
+                    "type": "number"
+                  },
+                  {
+                    "name": "next",
+                    "type": "number"
+                  },
+                  {
+                    "name": "last",
+                    "type": "number"
+                  }
+                ]
+              },
+              {
+                "name": "current",
+                "type": "number"
+              },
+              {
+                "name": "total",
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "name": "data",
+            "type": "array",
+            "sub": [
+              {
+                "type": "number",
+                "name": "id"
+              },
+              {
+                "type": "number",
+                "name": "orcamento_etapa_id"
+              },
+              {
+                "type": "text",
+                "name": "nome"
+              },
+              {
+                "type": "text",
+                "name": "descricao"
+              },
+              {
+                "type": "text",
+                "name": "unidade"
+              },
+              {
+                "type": "text",
+                "name": "quantidade"
+              },
+              {
+                "type": "text",
+                "name": "preco_unitario"
+              }
+            ]
+          }
+        ],
+        "outputType": "object"
+      }
+    ]
+  }
+}

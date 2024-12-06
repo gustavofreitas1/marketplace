@@ -1,0 +1,19 @@
+{
+  "name": "db",
+  "module": "dbconnector",
+  "action": "connect",
+  "options": {
+    "client": "postgres",
+    "connection": {
+      "host": "db",
+      "port": 5432,
+      "user": "db_user",
+      "password": "uSWRzeMD",
+      "database": "principal"
+    },
+    "meta": {}
+  },
+  "actionFilePath": "file:///C:/Users/gusta/Desktop/wappler/principal/app/modules/connections/db.json",
+  "serverType": "node",
+  "fileName": "db.json"
+}

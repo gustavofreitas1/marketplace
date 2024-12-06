@@ -1,0 +1,351 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "descricao_subetapa"
+      },
+      {
+        "type": "text",
+        "name": "unidade_subetapa"
+      },
+      {
+        "type": "text",
+        "name": "quantidade_subetapa"
+      },
+      {
+        "type": "text",
+        "name": "preco_unitario_subetapa"
+      },
+      {
+        "type": "text",
+        "name": "nome_subetapa"
+      },
+      {
+        "type": "text",
+        "name": "token_empreendimento_subetapa"
+      },
+      {
+        "type": "text",
+        "name": "id_etapa"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "empreendimento_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "empreendimentos",
+                "column": "id",
+                "recid": 1
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.token_empreendimento_subetapa}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "empreendimentos"
+            },
+            "primary": "id",
+            "joins": [],
+            "query": "select \"id\" from \"empreendimentos\" where \"empreendimentos\".\"token_empreendimento\" = ?",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "empreendimentos.token_empreendimento",
+                  "field": "empreendimentos.token_empreendimento",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.token_empreendimento_subetapa}}",
+                  "data": {
+                    "table": "empreendimentos",
+                    "column": "token_empreendimento",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "name": "token_empreendimento"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "empreendimentos"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            }
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "etapa_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "orcamento_etapa",
+                "column": "id"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{empreendimento_atual.id}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{$_POST.id_etapa}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "orcamento_etapa"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "orcamento_etapa.empreendimento_id",
+                  "field": "orcamento_etapa.empreendimento_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{empreendimento_atual.id}}",
+                  "data": {
+                    "table": "orcamento_etapa",
+                    "column": "empreendimento_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "reference",
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "references": "id",
+                      "inTable": "empreendimentos",
+                      "referenceType": "integer",
+                      "onUpdate": "CASCADE",
+                      "onDelete": "CASCADE",
+                      "name": "empreendimento_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "orcamento_etapa"
+                },
+                {
+                  "id": "orcamento_etapa.id",
+                  "field": "orcamento_etapa.id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.id_etapa}}",
+                  "data": {
+                    "table": "orcamento_etapa",
+                    "column": "id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "increments",
+                      "default": "",
+                      "primary": true,
+                      "unique": true,
+                      "nullable": false,
+                      "name": "id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "orcamento_etapa"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "sub": {
+              "subetapa": {
+                "table": {
+                  "name": "orcamento_etapa_subetapa",
+                  "alias": "subetapa"
+                },
+                "key": "orcamento_etapa_id"
+              }
+            },
+            "query": "select \"id\" from \"orcamento_etapa\" where \"orcamento_etapa\".\"empreendimento_id\" = ? and \"orcamento_etapa\".\"id\" = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          },
+          {
+            "name": "subetapa",
+            "type": "array",
+            "sub": [
+              {
+                "type": "number",
+                "name": "id"
+              },
+              {
+                "type": "number",
+                "name": "orcamento_etapa_id"
+              },
+              {
+                "type": "text",
+                "name": "nome"
+              },
+              {
+                "type": "text",
+                "name": "descricao"
+              },
+              {
+                "type": "text",
+                "name": "unidade"
+              },
+              {
+                "type": "text",
+                "name": "quantidade"
+              },
+              {
+                "type": "text",
+                "name": "preco_unitario"
+              }
+            ]
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "insert_subetapa",
+        "module": "dbupdater",
+        "action": "insert",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "insert",
+            "values": [
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "orcamento_etapa_id",
+                "type": "number",
+                "value": "{{etapa_atual.id}}"
+              },
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "nome",
+                "type": "text",
+                "value": "{{$_POST.nome_subetapa}}"
+              },
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "descricao",
+                "type": "text",
+                "value": "{{$_POST.descricao_subetapa}}"
+              },
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "unidade",
+                "type": "text",
+                "value": "{{$_POST.unidade_subetapa}}"
+              },
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "quantidade",
+                "type": "text",
+                "value": "{{$_POST.quantidade_subetapa}}"
+              },
+              {
+                "table": "orcamento_etapa_subetapa",
+                "column": "preco_unitario",
+                "type": "text",
+                "value": "{{$_POST.preco_unitario_subetapa}}"
+              }
+            ],
+            "table": "orcamento_etapa_subetapa",
+            "returning": "id",
+            "query": "insert into \"orcamento_etapa_subetapa\" (\"descricao\", \"nome\", \"orcamento_etapa_id\", \"preco_unitario\", \"quantidade\", \"unidade\") values (?, ?, ?, ?, ?, ?)",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{etapa_atual.id}}",
+                "test": ""
+              },
+              {
+                "name": ":P2",
+                "type": "expression",
+                "value": "{{$_POST.nome_subetapa}}",
+                "test": ""
+              },
+              {
+                "name": ":P3",
+                "type": "expression",
+                "value": "{{$_POST.descricao_subetapa}}",
+                "test": ""
+              },
+              {
+                "name": ":P4",
+                "type": "expression",
+                "value": "{{$_POST.unidade_subetapa}}",
+                "test": ""
+              },
+              {
+                "name": ":P5",
+                "type": "expression",
+                "value": "{{$_POST.quantidade_subetapa}}",
+                "test": ""
+              },
+              {
+                "name": ":P6",
+                "type": "expression",
+                "value": "{{$_POST.preco_unitario_subetapa}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          },
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  }
+}

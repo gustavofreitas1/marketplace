@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "token_empreendimento"
+      },
+      {
+        "type": "text",
+        "name": "offset"
+      },
+      {
+        "type": "text",
+        "name": "limit"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "empreendimento_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "empreendimentos",
+                "column": "id"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.token_empreendimento}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "empreendimentos"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "empreendimentos.token_empreendimento",
+                  "field": "empreendimentos.token_empreendimento",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_GET.token_empreendimento}}",
+                  "data": {
+                    "table": "empreendimentos",
+                    "column": "token_empreendimento",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "name": "token_empreendimento"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select \"id\" from \"empreendimentos\" where \"empreendimentos\".\"token_empreendimento\" = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "solicitacao_atual",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "solicitacao_compra",
+                "column": "id"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{empreendimento_atual.id}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "solicitacao_compra"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "solicitacao_compra.empreendimento_id",
+                  "field": "solicitacao_compra.empreendimento_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{empreendimento_atual.id}}",
+                  "data": {
+                    "table": "solicitacao_compra",
+                    "column": "empreendimento_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "reference",
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "references": "id",
+                      "inTable": "empreendimentos",
+                      "referenceType": "integer",
+                      "onUpdate": "CASCADE",
+                      "onDelete": "CASCADE",
+                      "name": "empreendimento_id"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select \"id\" from \"solicitacao_compra\" where \"solicitacao_compra\".\"empreendimento_id\" = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "listar_orcamentos",
+        "module": "dbconnector",
+        "action": "paged",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "orcamento_solicitacao",
+                "column": "*"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{solicitacao_atual.id}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "orcamento_solicitacao"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "orcamento_solicitacao.solicitação_id",
+                  "field": "orcamento_solicitacao.solicitação_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{solicitacao_atual.id}}",
+                  "data": {
+                    "table": "orcamento_solicitacao",
+                    "column": "solicitação_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "reference",
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "references": "id",
+                      "inTable": "solicitacao_compra",
+                      "referenceType": "integer",
+                      "onUpdate": "CASCADE",
+                      "onDelete": "CASCADE",
+                      "name": "solicitação_id"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select * from \"orcamento_solicitacao\" where \"orcamento_solicitacao\".\"solicitação_id\" = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "offset",
+            "type": "number"
+          },
+          {
+            "name": "limit",
+            "type": "number"
+          },
+          {
+            "name": "total",
+            "type": "number"
+          },
+          {
+            "name": "page",
+            "type": "object",
+            "sub": [
+              {
+                "name": "offset",
+                "type": "object",
+                "sub": [
+                  {
+                    "name": "first",
+                    "type": "number"
+                  },
+                  {
+                    "name": "prev",
+                    "type": "number"
+                  },
+                  {
+                    "name": "next",
+                    "type": "number"
+                  },
+                  {
+                    "name": "last",
+                    "type": "number"
+                  }
+                ]
+              },
+              {
+                "name": "current",
+                "type": "number"
+              },
+              {
+                "name": "total",
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "name": "data",
+            "type": "array",
+            "sub": [
+              {
+                "type": "number",
+                "name": "id"
+              },
+              {
+                "type": "text",
+                "name": "observação"
+              },
+              {
+                "type": "text",
+                "name": "valor_total"
+              },
+              {
+                "type": "number",
+                "name": "solicitação_id"
+              }
+            ]
+          }
+        ],
+        "outputType": "object"
+      }
+    ]
+  }
+}

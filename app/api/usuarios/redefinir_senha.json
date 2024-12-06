@@ -1,0 +1,191 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "senha"
+      },
+      {
+        "type": "text",
+        "name": "token"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "Verificar_token",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.token}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "auth_users"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "auth_users.token",
+                  "field": "auth_users.token",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.token}}",
+                  "data": {
+                    "table": "auth_users",
+                    "column": "token",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "name": "token"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select * from \"auth_users\" where \"auth_users\".\"token\" = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          },
+          {
+            "type": "text",
+            "name": "email"
+          },
+          {
+            "type": "text",
+            "name": "senha"
+          },
+          {
+            "type": "text",
+            "name": "nome"
+          },
+          {
+            "type": "text",
+            "name": "token"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{Verificar_token}}",
+          "then": {
+            "steps": {
+              "name": "update_senha",
+              "module": "dbupdater",
+              "action": "update",
+              "options": {
+                "connection": "db",
+                "sql": {
+                  "type": "update",
+                  "values": [
+                    {
+                      "table": "auth_users",
+                      "column": "senha",
+                      "type": "text",
+                      "value": "{{$_POST.senha.sha1()}}"
+                    },
+                    {
+                      "table": "auth_users",
+                      "column": "token",
+                      "type": "text",
+                      "value": "{{UUID}}"
+                    }
+                  ],
+                  "table": "auth_users",
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "id": "token",
+                        "field": "token",
+                        "type": "string",
+                        "operator": "equal",
+                        "value": "{{$_POST.token}}",
+                        "data": {
+                          "column": "token"
+                        },
+                        "operation": "="
+                      }
+                    ],
+                    "conditional": null,
+                    "valid": true
+                  },
+                  "returning": "id",
+                  "query": "update \"auth_users\" set \"senha\" = ?, \"token\" = ? where \"token\" = ?",
+                  "params": [
+                    {
+                      "name": ":P1",
+                      "type": "expression",
+                      "value": "{{$_POST.senha.sha1()}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P2",
+                      "type": "expression",
+                      "value": "{{UUID}}",
+                      "test": ""
+                    },
+                    {
+                      "operator": "equal",
+                      "type": "expression",
+                      "name": ":P3",
+                      "value": "{{$_POST.token}}",
+                      "test": ""
+                    }
+                  ]
+                }
+              },
+              "meta": [
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ]
+            }
+          },
+          "else": {
+            "steps": {
+              "name": "erro",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 403,
+                "data": "Token inválido!"
+              }
+            }
+          }
+        },
+        "outputType": "boolean"
+      }
+    ]
+  }
+}

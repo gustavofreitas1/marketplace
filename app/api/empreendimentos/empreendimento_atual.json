@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "token_empreendimento"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "auth"
+        },
+        "meta": []
+      },
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "SELECT",
+            "distinct": false,
+            "columns": [
+              {
+                "table": "empreendimentos",
+                "column": "*"
+              }
+            ],
+            "table": {
+              "name": "empreendimentos"
+            },
+            "joins": [],
+            "orders": [],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.token_empreendimento}}",
+                "test": ""
+              }
+            ],
+            "primary": "id",
+            "query": "select * from \"empreendimentos\" where \"empreendimentos\".\"token_empreendimento\" = ?",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "empreendimentos.token_empreendimento",
+                  "field": "empreendimentos.token_empreendimento",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_GET.token_empreendimento}}",
+                  "data": {
+                    "table": "empreendimentos",
+                    "column": "token_empreendimento",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "unique": false,
+                      "nullable": true,
+                      "name": "token_empreendimento"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "empreendimentos"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            }
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "number",
+            "name": "id"
+          },
+          {
+            "type": "text",
+            "name": "nome"
+          },
+          {
+            "type": "text",
+            "name": "localizacao"
+          },
+          {
+            "type": "text",
+            "name": "area_total"
+          },
+          {
+            "type": "date",
+            "name": "data_inicio"
+          },
+          {
+            "type": "date",
+            "name": "data_entrega"
+          },
+          {
+            "type": "text",
+            "name": "tipo"
+          },
+          {
+            "type": "number",
+            "name": "id_empresa"
+          },
+          {
+            "type": "text",
+            "name": "token_empreendimento"
+          }
+        ],
+        "outputType": "object",
+        "type": "dbconnector_single"
+      }
+    ]
+  }
+}
