@@ -12,14 +12,6 @@
       {
         "type": "text",
         "name": "senha"
-      },
-      {
-        "type": "text",
-        "name": "empresa"
-      },
-      {
-        "type": "text",
-        "name": "cnpj"
       }
     ]
   },
@@ -44,21 +36,22 @@
               }
             ],
             "table": {
-              "name": "auth_users"
+              "name": "users"
             },
             "primary": "id",
             "joins": [],
+            "query": "select * from \"users\" where \"users\".\"email\" = ?",
             "wheres": {
               "condition": "AND",
               "rules": [
                 {
-                  "id": "auth_users.email",
-                  "field": "auth_users.email",
+                  "id": "users.email",
+                  "field": "users.email",
                   "type": "string",
                   "operator": "equal",
                   "value": "{{$_POST.email.lowercase()}}",
                   "data": {
-                    "table": "auth_users",
+                    "table": "users",
                     "column": "email",
                     "type": "text",
                     "columnObj": {
@@ -75,8 +68,7 @@
               ],
               "conditional": null,
               "valid": true
-            },
-            "query": "select * from \"auth_users\" where \"auth_users\".\"email\" = ?"
+            }
           }
         },
         "meta": [
@@ -107,14 +99,6 @@
           {
             "type": "text",
             "name": "telefone"
-          },
-          {
-            "type": "number",
-            "name": "empresa_id"
-          },
-          {
-            "type": "number",
-            "name": "empreendimento_auth"
           }
         ],
         "outputType": "object"
@@ -137,148 +121,82 @@
             }
           },
           "else": {
-            "steps": [
-              {
-                "name": "insert_empresa",
-                "module": "dbupdater",
-                "action": "insert",
-                "options": {
-                  "connection": "db",
-                  "sql": {
-                    "type": "insert",
-                    "values": [
-                      {
-                        "table": "Empresas",
-                        "column": "nome",
-                        "type": "text",
-                        "value": "{{$_POST.empresa}}"
-                      },
-                      {
-                        "table": "Empresas",
-                        "column": "cnpj",
-                        "type": "text",
-                        "value": "{{$_POST.cnpj}}"
-                      }
-                    ],
-                    "table": "Empresas",
-                    "returning": "id",
-                    "query": "insert into \"Empresas\" (\"cnpj\", \"nome\") values (?, ?) returning \"id\"",
-                    "params": [
-                      {
-                        "name": ":P1",
-                        "type": "expression",
-                        "value": "{{$_POST.empresa}}",
-                        "test": ""
-                      },
-                      {
-                        "name": ":P2",
-                        "type": "expression",
-                        "value": "{{$_POST.cnpj}}",
-                        "test": ""
-                      }
-                    ]
-                  }
-                },
-                "meta": [
-                  {
-                    "name": "identity",
-                    "type": "text"
-                  },
-                  {
-                    "name": "affected",
-                    "type": "number"
-                  }
-                ]
+            "steps": {
+              "name": "inserir_cadastro",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "db",
+                "sql": {
+                  "type": "insert",
+                  "values": [
+                    {
+                      "table": "users",
+                      "column": "email",
+                      "type": "text",
+                      "value": "{{$_POST.email.lowercase()}}"
+                    },
+                    {
+                      "table": "users",
+                      "column": "senha",
+                      "type": "text",
+                      "value": "{{$_POST.senha.sha1()}}"
+                    },
+                    {
+                      "table": "users",
+                      "column": "nome",
+                      "type": "text",
+                      "value": "{{$_POST.nome}}"
+                    },
+                    {
+                      "table": "users",
+                      "column": "token",
+                      "type": "text",
+                      "value": "{{UUID}}"
+                    }
+                  ],
+                  "table": "users",
+                  "returning": "id",
+                  "query": "insert into \"users\" (\"email\", \"nome\", \"senha\", \"token\") values (?, ?, ?, ?) returning \"id\"",
+                  "params": [
+                    {
+                      "name": ":P1",
+                      "type": "expression",
+                      "value": "{{$_POST.email.lowercase()}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P2",
+                      "type": "expression",
+                      "value": "{{$_POST.senha.sha1()}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P3",
+                      "type": "expression",
+                      "value": "{{$_POST.nome}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P4",
+                      "type": "expression",
+                      "value": "{{UUID}}",
+                      "test": ""
+                    }
+                  ]
+                }
               },
-              {
-                "name": "inserir_cadastro",
-                "module": "dbupdater",
-                "action": "insert",
-                "options": {
-                  "connection": "db",
-                  "sql": {
-                    "type": "insert",
-                    "values": [
-                      {
-                        "table": "auth_users",
-                        "column": "email",
-                        "type": "text",
-                        "value": "{{$_POST.email.lowercase()}}"
-                      },
-                      {
-                        "table": "auth_users",
-                        "column": "senha",
-                        "type": "text",
-                        "value": "{{$_POST.senha.sha1()}}"
-                      },
-                      {
-                        "table": "auth_users",
-                        "column": "nome",
-                        "type": "text",
-                        "value": "{{$_POST.nome.lowercase()}}"
-                      },
-                      {
-                        "table": "auth_users",
-                        "column": "token",
-                        "type": "text",
-                        "value": "{{UUID}}"
-                      },
-                      {
-                        "table": "auth_users",
-                        "column": "empresa_id",
-                        "type": "number",
-                        "value": "{{insert_empresa.identity}}"
-                      }
-                    ],
-                    "table": "auth_users",
-                    "returning": "id",
-                    "query": "insert into \"auth_users\" (\"email\", \"empresa_id\", \"nome\", \"senha\", \"token\") values (?, ?, ?, ?, ?) returning \"id\"",
-                    "params": [
-                      {
-                        "name": ":P1",
-                        "type": "expression",
-                        "value": "{{$_POST.email.lowercase()}}",
-                        "test": ""
-                      },
-                      {
-                        "name": ":P2",
-                        "type": "expression",
-                        "value": "{{$_POST.senha.sha1()}}",
-                        "test": ""
-                      },
-                      {
-                        "name": ":P3",
-                        "type": "expression",
-                        "value": "{{$_POST.nome.lowercase()}}",
-                        "test": ""
-                      },
-                      {
-                        "name": ":P4",
-                        "type": "expression",
-                        "value": "{{UUID}}",
-                        "test": ""
-                      },
-                      {
-                        "name": ":P5",
-                        "type": "expression",
-                        "value": "{{insert_empresa.identity}}",
-                        "test": ""
-                      }
-                    ]
-                  }
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "text"
                 },
-                "meta": [
-                  {
-                    "name": "identity",
-                    "type": "text"
-                  },
-                  {
-                    "name": "affected",
-                    "type": "number"
-                  }
-                ]
-              }
-            ]
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ]
+            }
           }
         },
         "outputType": "boolean"

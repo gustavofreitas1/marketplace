@@ -35,6 +35,10 @@
       {
         "type": "text",
         "name": "telefone"
+      },
+      {
+        "type": "number",
+        "name": "id"
       }
     ]
   },
@@ -96,53 +100,48 @@
             "type": "update",
             "values": [
               {
-                "table": "auth_users",
+                "table": "users",
                 "column": "senha",
                 "type": "text",
-                "value": "{{$_POST.senha.sha1()}}",
-                "condition": "{{$_POST.senha}}"
+                "value": "{{$_POST.senha.sha1()}}"
               },
               {
-                "table": "auth_users",
+                "table": "users",
                 "column": "nome",
                 "type": "text",
                 "value": "{{$_POST.nome}}"
               },
               {
-                "table": "auth_users",
+                "table": "users",
                 "column": "foto",
                 "type": "text",
-                "value": "{{upload.url}}",
-                "condition": "{{$_POST.foto}}"
+                "value": "{{$_POST.foto}}"
               },
               {
-                "table": "auth_users",
+                "table": "users",
                 "column": "telefone",
                 "type": "text",
                 "value": "{{$_POST.telefone}}"
               }
             ],
-            "table": "auth_users",
+            "table": "users",
             "wheres": {
               "condition": "AND",
               "rules": [
                 {
                   "id": "id",
-                  "field": "id",
                   "type": "double",
                   "operator": "equal",
-                  "value": "{{identificar_usuario_logado}}",
+                  "value": "{{$_POST.id}}",
                   "data": {
                     "column": "id"
                   },
                   "operation": "="
                 }
-              ],
-              "conditional": null,
-              "valid": true
+              ]
             },
             "returning": "id",
-            "query": "update \"auth_users\" set \"senha\" = ?, \"nome\" = ?, \"foto\" = ?, \"telefone\" = ? where \"id\" = ? returning \"id\"",
+            "query": "update \"users\" set \"senha\" = ?, \"nome\" = ?, \"foto\" = ?, \"telefone\" = ? where \"id\" = ? returning \"id\"",
             "params": [
               {
                 "name": ":P1",
@@ -159,7 +158,7 @@
               {
                 "name": ":P3",
                 "type": "expression",
-                "value": "{{upload.url}}",
+                "value": "{{$_POST.foto}}",
                 "test": ""
               },
               {
@@ -172,7 +171,7 @@
                 "operator": "equal",
                 "type": "expression",
                 "name": ":P5",
-                "value": "{{identificar_usuario_logado}}",
+                "value": "{{$_POST.id}}",
                 "test": ""
               }
             ]

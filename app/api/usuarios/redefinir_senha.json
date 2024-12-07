@@ -8,6 +8,10 @@
       {
         "type": "text",
         "name": "token"
+      },
+      {
+        "type": "number",
+        "name": "id"
       }
     ]
   },
@@ -32,21 +36,22 @@
               }
             ],
             "table": {
-              "name": "auth_users"
+              "name": "users"
             },
             "primary": "id",
             "joins": [],
+            "query": "select * from \"users\" where \"users\".\"token\" = ?",
             "wheres": {
               "condition": "AND",
               "rules": [
                 {
-                  "id": "auth_users.token",
-                  "field": "auth_users.token",
+                  "id": "users.token",
+                  "field": "users.token",
                   "type": "string",
                   "operator": "equal",
                   "value": "{{$_POST.token}}",
                   "data": {
-                    "table": "auth_users",
+                    "table": "users",
                     "column": "token",
                     "type": "text",
                     "columnObj": {
@@ -63,8 +68,7 @@
               ],
               "conditional": null,
               "valid": true
-            },
-            "query": "select * from \"auth_users\" where \"auth_users\".\"token\" = ?"
+            }
           }
         },
         "meta": [
@@ -87,6 +91,14 @@
           {
             "type": "text",
             "name": "token"
+          },
+          {
+            "type": "text",
+            "name": "foto"
+          },
+          {
+            "type": "text",
+            "name": "telefone"
           }
         ],
         "outputType": "object"
@@ -108,39 +120,36 @@
                   "type": "update",
                   "values": [
                     {
-                      "table": "auth_users",
+                      "table": "users",
                       "column": "senha",
                       "type": "text",
                       "value": "{{$_POST.senha.sha1()}}"
                     },
                     {
-                      "table": "auth_users",
+                      "table": "users",
                       "column": "token",
                       "type": "text",
                       "value": "{{UUID}}"
                     }
                   ],
-                  "table": "auth_users",
+                  "table": "users",
                   "wheres": {
                     "condition": "AND",
                     "rules": [
                       {
-                        "id": "token",
-                        "field": "token",
-                        "type": "string",
+                        "id": "id",
+                        "type": "double",
                         "operator": "equal",
-                        "value": "{{$_POST.token}}",
+                        "value": "{{$_POST.id}}",
                         "data": {
-                          "column": "token"
+                          "column": "id"
                         },
                         "operation": "="
                       }
-                    ],
-                    "conditional": null,
-                    "valid": true
+                    ]
                   },
                   "returning": "id",
-                  "query": "update \"auth_users\" set \"senha\" = ?, \"token\" = ? where \"token\" = ?",
+                  "query": "update \"users\" set \"senha\" = ?, \"token\" = ? where \"id\" = ? returning \"id\"",
                   "params": [
                     {
                       "name": ":P1",
@@ -158,7 +167,7 @@
                       "operator": "equal",
                       "type": "expression",
                       "name": ":P3",
-                      "value": "{{$_POST.token}}",
+                      "value": "{{$_POST.id}}",
                       "test": ""
                     }
                   ]

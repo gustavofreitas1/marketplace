@@ -1,5 +1,5 @@
 {
-  "projectName": "principal",
+  "projectName": "marketplace",
   "styleFile": "/css/style.css",
   "assetsFolder": "/assets",
   "designFramework": "bootstrap5",
@@ -54,5 +54,6 @@
   ],
   "activeTarget": "Development",
   "projectType": "web",
-  "extensions": []
+  "extensions": [],
+  "activeGitRemote": "marketplace"
 }

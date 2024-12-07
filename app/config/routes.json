@@ -46,48 +46,6 @@
       "path": "/configuracoes",
       "page": "configuracoes",
       "layout": "home"
-    },
-    {
-      "path": "/testes",
-      "page": "testes",
-      "layout": "erp"
-    },
-    {
-      "path": "/empreendimentos",
-      "page": "empreendimentos",
-      "layout": "home"
-    },
-    {
-      "path": "/add_empreendimento",
-      "page": "add_empreendimento",
-      "layout": "home"
-    },
-    {
-      "path": "/dashboard",
-      "page": "dashboard",
-      "layout": "erp"
-    },
-    {
-      "path": "/orcamento",
-      "page": "orcamento",
-      "layout": "erp"
-    },
-    {
-      "path": "/estoque",
-      "page": "estoque",
-      "layout": "erp"
-    },
-    {
-      "path": "/erp/:token_empreendimento",
-      "page": "erp",
-      "layout": "erp",
-      "routes": [
-        {
-          "type": "page",
-          "path": "/erp/:token_empreendimento",
-          "id": "token_empreendimento"
-        }
-      ]
     }
   ],
   "layouts": {
